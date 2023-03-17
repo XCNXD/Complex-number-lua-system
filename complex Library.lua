@@ -22,9 +22,7 @@ meta.__mul = function(a,b)
     else
         re = (a[1]*b[1]) - (a[2] * b[2])
         im = (a[1]*b[2]) + (a[2] * b[1])
-
 end
- 
  return complex.new(re,im)
 end
 meta.__div = function(a,b)
@@ -40,33 +38,53 @@ meta.__div = function(a,b)
     
  return complex.new(re,im)
 end 
+meta.__pow = function(a,b)
+    local comp = a
+    if b == 0 then 
+        return complex.new(1,0)
+    elseif b == 1 then 
+        return a 
+    elseif b>0 and b<1 then 
+        return "Support soon"
+    else
+        local temp = a
+        for i = 2,b do 
+            comp = comp*temp
+        end 
+    end 
+
+    return comp
+end 
 meta.__tostring = function(a)
     if a[2] < 0 then 
-        return a[1].." - "..math.abs(a[2]) .."i"
-    else
-        return a[1].." + "..a[2] .."i"
+        return a[1].." - "..math.abs(a[2]) .." i"
+    elseif a[2] == 0 then 
+        return a[1].." + ".."0 i"
+    else 
+        return a[1].." + "..a[2] .." i"
     end 
  
 end
+
 meta.__index = function(a,key)
 if key == "Range" or key == "Size" then
  return (a[1]^2 + a[2]^2)^(1/2)
+
  elseif key == "Angle" then
-   local a_tan = math.atan(a[2]/a[1])
-   if a[1] < 0 then 
-        return 180+math.deg(a_tan),a_tan
-   else
-    if a[2] < 0 then
-        return 360+math.deg(a_tan),a_tan
-    end
-   end 
-   
-  return math.deg(a_tan),a_tan
- elseif key:lower():find("polar") then
+    local re = a[1]
+    local im = a[2]
+    local atan = math.atan2(im,re)
+    if atan < 0 then 
+        atan = (atan+2*math.pi)
+    end 
+  return math.deg(atan);
+ elseif key == "Polar" then
    local angle = a.Angle
-  return a.Size.."(cos("..angle..") + i*sin("..angle.."))"
+  return a.Size.."(cos("..angle..") + i*sin("..angle.."))";
+
   elseif key == "Conjugate" then
-    return complex.new(a[1],-a[2])
+    return complex.new(a[1],-a[2]);
+
 end
 end
 
@@ -78,3 +96,6 @@ complex.new = function(re,im)
  setmetatable(matrix,meta)
  return matrix
 end
+
+
+getgenv().complex = complex
